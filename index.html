@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Générateur de Causeries Mathématiques</title>
+  
+  <!-- Tailwind CSS pour le style -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Styles personnalisés pour la barre de défilement et les animations */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9; 
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1; 
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8; 
+    }
+    .animate-fade-in {
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Utilitaires pour masquer les éléments natifs */
+    [v-cloak] { display: none; }
+  </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 pb-20">
+
+  <!-- Conteneur principal de l'application -->
+  <div id="app"></div>
+
+  <script>
+    // --- DONNÉES PFEQ ---
+    const CONCEPTS_DATA = [
+      // A. ARITHMÉTIQUE - 1. Nombres naturels
+      { id: 'a1_1', text: "Compter ou réciter la comptine des nombres par ordre croissant (1er cycle)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "1. Nombres naturels", finalCycle: 1, finalYear: 1 },
+      { id: 'a1_2', text: "Compter ou réciter la comptine par ordre décroissant (1er cycle)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "1. Nombres naturels", finalCycle: 1, finalYear: 2 },
+      { id: 'a1_3', text: "Compter par bonds (1er et 2e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "1. Nombres naturels", finalCycle: 2, finalYear: 3 },
+      { id: 'a1_4', text: "Dénombrer des collections réelles ou dessinées (1er cycle)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "1. Nombres naturels", finalCycle: 1, finalYear: 1 },
+      { id: 'a1_5', text: "Lire et écrire tout nombre naturel (1er, 2e et 3e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "1. Nombres naturels", finalCycle: 3, finalYear: 5 },
+      { id: 'a1_6', text: "Représenter des nombres naturels : accent mis sur le groupement (1er cycle)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "1. Nombres naturels", finalCycle: 1, finalYear: 1 },
+      { id: 'a1_7', text: "Représenter des nombres naturels : accent mis sur l’échange (base 10) (1er et 2e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "1. Nombres naturels", finalCycle: 2, finalYear: 4 },
+      { id: 'a1_8', text: "Représenter des nombres naturels : accent mis sur la valeur de position (1er et 2e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "1. Nombres naturels", finalCycle: 2, finalYear: 4 },
+      { id: 'a1_9', text: "Représenter la puissance d’un nombre naturel (3e cycle)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "1. Nombres naturels", finalCycle: 3, finalYear: 6 },
+      { id: 'a1_10', text: "Composer et décomposer un nombre naturel (1er et 2e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "1. Nombres naturels", finalCycle: 2, finalYear: 3 },
+      { id: 'a1_11', text: "Reconnaître des expressions équivalentes (ex: 52 = 40 + 12) (1er cycle)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "1. Nombres naturels", finalCycle: 1, finalYear: 2 },
+      { id: 'a1_12', text: "Comparer entre eux des nombres naturels (1er, 2e et 3e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "1. Nombres naturels", finalCycle: 3, finalYear: 5 },
+      { id: 'a1_13', text: "Ordonner des nombres naturels (1er, 2e et 3e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "1. Nombres naturels", finalCycle: 3, finalYear: 5 },
+      { id: 'a1_14', text: "Décrire des régularités numériques (ex: pairs/impairs, divisibilité) (1er, 2e et 3e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "1. Nombres naturels", finalCycle: 3, finalYear: 6 },
+      { id: 'a1_15', text: "Situer des nombres naturels sur un axe (droite numérique) (1er, 2e et 3e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "1. Nombres naturels", finalCycle: 3, finalYear: 6 },
+      { id: 'a1_16', text: "Identifier les propriétés des nombres naturels (pair, impair, premier, composé) (1er, 2e et 3e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "1. Nombres naturels", finalCycle: 3, finalYear: 6 },
+      { id: 'a1_17', text: "Classifier des nombres naturels de diverses façons (2e cycle)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "1. Nombres naturels", finalCycle: 2, finalYear: 4 },
+      { id: 'a1_18', text: "Faire une approximation d’une collection (estimer) (1er, 2e et 3e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "1. Nombres naturels", finalCycle: 3, finalYear: 5 },
+
+      // A. ARITHMÉTIQUE - 2. Fractions
+      { id: 'a2_1', text: "Reconnaître des fractions provenant de la vie courante (2e cycle)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "2. Fractions", finalCycle: 2, finalYear: 3 },
+      { id: 'a2_2', text: "Représenter une fraction de différentes façons (partie d'un tout/collection) (2e et 3e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "2. Fractions", finalCycle: 3, finalYear: 5 },
+      { id: 'a2_3', text: "Associer une fraction à une partie d’un tout ou d'une collection (2e cycle)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "2. Fractions", finalCycle: 2, finalYear: 4 },
+      { id: 'a2_4', text: "Reconnaître les différents sens de la fraction (partage, division, rapport) (2e et 3e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "2. Fractions", finalCycle: 3, finalYear: 6 },
+      { id: 'a2_5', text: "Distinguer le rôle du numérateur et du dénominateur (2e et 3e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "2. Fractions", finalCycle: 3, finalYear: 5 },
+      { id: 'a2_6', text: "Lire et écrire une fraction (2e et 3e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "2. Fractions", finalCycle: 3, finalYear: 5 },
+      { id: 'a2_7', text: "Comparer une fraction à 0, à 1/2 ou à 1 (2e cycle)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "2. Fractions", finalCycle: 2, finalYear: 4 },
+      { id: 'a2_8', text: "Vérifier l’équivalence de deux fractions (2e et 3e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "2. Fractions", finalCycle: 3, finalYear: 6 },
+      { id: 'a2_9', text: "Associer un nombre décimal ou un pourcentage à une fraction (3e cycle)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "2. Fractions", finalCycle: 3, finalYear: 6 },
+      { id: 'a2_10', text: "Ordonner des fractions (dénominateurs identiques ou multiples) (2e et 3e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "2. Fractions", finalCycle: 3, finalYear: 6 },
+      { id: 'a2_11', text: "Situer des fractions sur un axe (2e et 3e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "2. Fractions", finalCycle: 3, finalYear: 5 },
+      { id: 'a2_12', text: "Reconnaître des fractions irréductibles (3e cycle)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "2. Fractions", finalCycle: 3, finalYear: 6 },
+
+      // A. ARITHMÉTIQUE - 3. Nombres décimaux
+      { id: 'a3_1', text: "Représenter des nombres décimaux (matériel concret ou dessins) (2e et 3e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "3. Nombres décimaux", finalCycle: 3, finalYear: 5 },
+      { id: 'a3_2', text: "Reconnaître des représentations équivalentes de nombres décimaux (2e et 3e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "3. Nombres décimaux", finalCycle: 3, finalYear: 5 },
+      { id: 'a3_3', text: "Lire et écrire des nombres écrits en notation décimale (2e et 3e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "3. Nombres décimaux", finalCycle: 3, finalYear: 6 },
+      { id: 'a3_4', text: "Reconnaître le rôle de la virgule et la valeur de position (2e et 3e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "3. Nombres décimaux", finalCycle: 3, finalYear: 5 },
+      { id: 'a3_5', text: "Composer et décomposer un nombre décimal (2e et 3e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "3. Nombres décimaux", finalCycle: 3, finalYear: 6 },
+      { id: 'a3_6', text: "Reconnaître des expressions numériques équivalentes (2e et 3e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "3. Nombres décimaux", finalCycle: 3, finalYear: 6 },
+      { id: 'a3_7', text: "Situer des nombres décimaux sur un axe (2e et 3e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "3. Nombres décimaux", finalCycle: 3, finalYear: 5 },
+      { id: 'a3_8', text: "Comparer entre eux des nombres décimaux (2e et 3e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "3. Nombres décimaux", finalCycle: 3, finalYear: 5 },
+      { id: 'a3_9', text: "Faire une approximation (arrondir, tronquer) (3e cycle)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "3. Nombres décimaux", finalCycle: 3, finalYear: 6 },
+      { id: 'a3_10', text: "Ordonner des nombres décimaux (2e et 3e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "3. Nombres décimaux", finalCycle: 3, finalYear: 5 },
+      { id: 'a3_11', text: "Associer une fraction ou un pourcentage à un nombre décimal (2e et 3e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "3. Nombres décimaux", finalCycle: 3, finalYear: 6 },
+
+      // A. ARITHMÉTIQUE - 5. Opérations
+      { id: 'a5_1', text: "Reconnaître l’opération (addition, soustraction, mult., div.) à effectuer (1er, 2e et 3e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "5. Opérations (Sens et Calcul)", finalCycle: 3, finalYear: 5 },
+      { id: 'a5_2', text: "Traduire une situation d'addition ou de soustraction (ajout, retrait, réunion, comparaison) (1er cycle)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "5. Opérations (Sens et Calcul)", finalCycle: 1, finalYear: 1 },
+      { id: 'a5_4', text: "Traduire une situation de multiplication ou division (disposition rectangulaire, partage) (2e et 3e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "5. Opérations (Sens et Calcul)", finalCycle: 3, finalYear: 5 },
+      { id: 'a5_8', text: "Traduire une situation par une suite d’opérations (chaînes d'opérations) (2e et 3e cycles)", cat: "A. ARITHMÉTIQUE (Nombres et Opérations)", sub: "5. Opérations (Sens et Calcul)", finalCycle: 3, finalYear: 6 },
+
+      // B. GÉOMÉTRIE - 3. Figures planes
+      { id: 'b3_1', text: "Identifier des figures planes (carré, rectangle, triangle, cercle, losange) (1er cycle)", cat: "B. GÉOMÉTRIE", sub: "3. Figures planes", finalCycle: 1, finalYear: 1 },
+      { id: 'b3_2', text: "Décrire des figures planes (côtés, sommets, angles) (2e cycle)", cat: "B. GÉOMÉTRIE", sub: "3. Figures planes", finalCycle: 2, finalYear: 3 },
+      { id: 'b3_3', text: "Classifier les polygones (convexes, non convexes) (2e cycle)", cat: "B. GÉOMÉTRIE", sub: "3. Figures planes", finalCycle: 2, finalYear: 4 },
+      
+      // C. MESURE - 1. Longueurs
+      { id: 'c1_2', text: "Estimer et mesurer avec des unités conventionnelles (m, dm, cm, mm, km) (1er, 2e et 3e cycles)", cat: "C. MESURE", sub: "1. Longueurs", finalCycle: 3, finalYear: 5 },
+      { id: 'c1_4', text: "Calculer le périmètre de figures planes (2e et 3e cycles)", cat: "C. MESURE", sub: "1. Longueurs", finalCycle: 3, finalYear: 6 },
+      
+      // D. STATISTIQUE ET PROBABILITÉ - 1. Statistique
+      { id: 'd1_1', text: "Formuler des questions d’enquête (1er, 2e et 3e cycles)", cat: "D. STATISTIQUE ET PROBABILITÉ", sub: "1. Statistique", finalCycle: 3, finalYear: 5 },
+      { id: 'd1_3', text: "Interpréter des données à l'aide d'un tableau, pictogramme ou diagramme à bandes (1er et 2e cycles)", cat: "D. STATISTIQUE ET PROBABILITÉ", sub: "1. Statistique", finalCycle: 2, finalYear: 3 },
+    ];
+
+    const ANIMATION_CHOICES = {
+      "Animations classiques": ["pense-parle-partage", "signe de la main", "déplacements", "zones de réponse", "ligne numérique humaine"],
+      "Échanges en binômes ou petits groupes": ["parler-passer", "rotations rapides"],
+      "Activités ludiques et interactives": ["vote avec jetons", "défis chronométrés", "mini-débats"]
+    };
+
+    const CAUSERIE_TYPES = [
+      "Trouver l’intrus (4 images obligatoires)", "Estimation mystère (1 image obligatoire de comptage)",
+      "Image – question directe", "Image – créer des questions", "Que choisirais-tu ? (2-3 images obligatoires)",
+      "Calcul mental", "Pareil, mais différent (2 images obligatoires)", "Toujours-parfois-jamais",
+      "Trouver l’erreur (4 images obligatoires)", "Énigme", "Parlons cubes (volume – solides obligatoires)"
+    ];
+
+    const VISUAL_STYLES = [
+      "cartoon", "réaliste", "schémas", "figures géométriques", "diagrammes (pictogrammes, barres, lignes, circulaires)",
+      "plan cartésien", "dessin", "image dynamite", "cinématique", "technicolor", "surréaliste", "mystère"
+    ];
+
+    const SUPPORT_CHOICES = {
+      "Support visuel": ["illustration réaliste", "images fixes", "schémas/diagrammes", "figures géométriques", "infographies", "tableaux numériques", "dessin"],
+      "Stimulus textuels": ["phrases mathématiques", "énigmes", "problèmes contextuels", "affirmations"],
+      "Stimulus manipulables": ["objets physiques", "cartes/étiquettes", "lignes numériques", "matériel géométrique"],
+      "Stimulus comparatifs": ["Pareil, mais différent", "Que choisirais-tu ?", "Trouver l’erreur"]
+    };
+
+    const LIEUX = ["À l’école", "Dans l’école", "Cour de récréation", "Gymnase", "dans la classe", "Cafétéria", "À l’extérieur", "Sortie au zoo", "Parc d’attraction", "Magasinage/boutique", "Épicerie", "Bibliothèque", "Autre"];
+    const THEMES = ["Une visite de zoo", "Le Marché", "La ferme", "Une fête d’anniversaire", "Un voyage en train", "La météo", "Le jardinage", "Un pique-nique", "Une course à vélo", "La cuisine", "Les animaux", "Un carnaval", "Une chasse au trésor", "L’exploration spatiale", "Les saisons", "Le sport", "Magasin de jouets", "Camping", "L’automne", "L’hiver", "Noël", "Pâques", "l’Halloween", "Autre"];
+
+    // --- ÉTAT DE L'APPLICATION ---
+    let state = {
+      currentStep: 1,
+      totalSteps: 8,
+      selectedCycle: null,
+      selectedYear: null,
+      selectedConcepts: [],
+      animationCat: "",
+      animationType: "",
+      causerieType: "",
+      visualStyle: "",
+      supportCat: "",
+      supportType: "",
+      iaDecidesTheme: true,
+      lieu: "",
+      customLieu: "",
+      theme: "",
+      customTheme: "",
+      languageLevel: null,
+      isCopied: false
+    };
+
+    const stepTitles = [
+      "Niveau & Concepts", "Animation", "Type de causerie", "Support visuel",
+      "Support d'amorce", "Lieu et thème", "Niveau de langage", "Résultat"
+    ];
+
+    // Groupement des concepts pour l'affichage
+    const groupedConcepts = CONCEPTS_DATA.reduce((acc, concept) => {
+      if (!acc[concept.cat]) acc[concept.cat] = {};
+      if (!acc[concept.cat][concept.sub]) acc[concept.cat][concept.sub] = [];
+      acc[concept.cat][concept.sub].push(concept);
+      return acc;
+    }, {});
+
+    // --- LOGIQUE MÉTIER ---
+
+    function getConceptStyle(concept) {
+      if (!state.selectedCycle || !state.selectedYear) return "text-gray-400 opacity-50";
+
+      let startCycle = 1;
+      if (concept.text.includes("1er")) startCycle = 1;
+      else if (concept.text.includes("2e")) startCycle = 2;
+      else if (concept.text.includes("3e")) startCycle = 3;
+
+      if (state.selectedCycle < startCycle) {
+        return "text-red-500 font-bold opacity-75"; 
+      } else if (state.selectedCycle > concept.finalCycle) {
+        return "text-gray-500 opacity-60"; 
+      } else {
+        if (concept.finalCycle === state.selectedCycle) {
+          if (concept.finalYear === state.selectedYear) {
+            return "text-blue-600 font-bold";
+          } else {
+            return "text-gray-900 font-bold";
+          }
+        } else {
+          return "text-blue-600 font-bold";
+        }
+      }
+    }
+
+    function generatePrompt() {
+      const conceptsText = state.selectedConcepts.map(id => {
+        return CONCEPTS_DATA.find(c => c.id === id)?.text;
+      }).join("\n- ");
+
+      let lieuText = state.iaDecidesTheme ? "Laisse ton intelligence créative choisir un lieu adapté." : (state.lieu === "Autre" ? state.customLieu : state.lieu);
+      let themeText = state.iaDecidesTheme ? "Laisse ton intelligence créative choisir un thème captivant." : (state.theme === "Autre" ? state.customTheme : state.theme);
+      
+      let visualInstruction = "";
+      if (state.visualStyle === "réaliste") {
+        visualInstruction = `
+[INSTRUCTION VISUELLE OBLIGATOIRE - STYLE RÉALISTE]
+- Always generate a realistic photo corresponding to the chosen math concept and scenario.
+- Use the following mandatory formulations in the AI prompt: "A realistic photo of a classroom with math activities, high-resolution, natural lighting, DSLR style"
+- Ensure that all math overlays (grids, fractions, gauges) in SVG are clearly visible.`;
+      } else if (state.visualStyle === "cartoon") {
+        visualInstruction = `
+[INSTRUCTION VISUELLE OBLIGATOIRE - STYLE CARTOON]
+- Always generate a stylized or cartoon illustration corresponding to the chosen math concept and scenario.
+- Use the following mandatory formulations in the AI prompt: "A cartoon classroom with kids learning, bright colors, vector art style"
+- Ensure that all math overlays are clearly visible and mathematically accurate.`;
+      } else {
+        visualInstruction = `[STYLE VISUEL]
+Générer l'environnement visuel dans le style : ${state.visualStyle}. Le rendu doit être interactif, HTML + SVG vectoriel pur. Les images doivent toujours être en lien avec les choix de concepts.`;
+      }
+
+      return `Tu es un concepteur pédagogique expert spécialisé dans la création de "causeries mathématiques" interactives pour les élèves du primaire (Québec), respectant rigoureusement le Programme de formation de l'école québécoise (PFEQ).
+
+Ton objectif est de générer une application web interactive (HTML/CSS/JS/SVG) d'une causerie mathématique prête à l'emploi. 
+
+=== PARAMÈTRES DE LA CAUSERIE ===
+- Niveau visé : Année ${state.selectedYear || 'Non spécifiée'} (Cycle ${state.selectedCycle || 'Non spécifié'})
+- Niveau de langage : ${state.languageLevel || 'Adapté à l\'âge'}
+- Lieu : ${lieuText}
+- Thème : ${themeText}
+- Type de causerie : ${state.causerieType || 'Standard'}
+- Type de support d'amorce : ${state.supportCat} -> ${state.supportType}
+- Méthode d'animation : ${state.animationCat} -> ${state.animationType}
+
+=== CONCEPTS MATHÉMATIQUES CIBLÉS ===
+- ${conceptsText || 'Aucun concept spécifique sélectionné'}
+
+=== MÉTA-CONSIGNES ===
+1. Stimuler le raisonnement, le langage mathématique, la discussion et la flexibilité.
+2. Toutes les situations proposées doivent permettre TOUTES LES RÉPONSES POSSIBLES si la réflexion et l'explication de l'élève sont adéquates.
+3. Intègre obligatoirement une démarche pas à pas pour l’enseignant pour animer la causerie selon la méthode choisie (${state.animationType}).
+4. Propose des solutions multiples et des stratégies variées.
+5. Intégration Interactive : Tu dois toujours proposer des propositions d’explications variées d’élèves fictifs sous forme de boutons.
+6. Le vocabulaire et la longueur des phrases doivent être parfaitement adaptés au "Niveau de langage" demandé.
+
+${visualInstruction}
+
+Génère le code complet, interactif, visuellement parfait et pédagogiquement infaillible.`;
+    }
+
+    // --- GESTION DES ÉVÈNEMENTS (GLOBAL) ---
+    window.setStep = (step) => { state.currentStep = step; render(); };
+    window.setCycle = (cycle) => { state.selectedCycle = cycle; state.selectedYear = null; render(); };
+    window.setYear = (year) => { state.selectedYear = year; render(); };
+    
+    window.toggleConcept = (id) => {
+      if (state.selectedConcepts.includes(id)) {
+        state.selectedConcepts = state.selectedConcepts.filter(c => c !== id);
+      } else {
+        state.selectedConcepts.push(id);
+      }
+      render();
+    };
+
+    window.setAnimationCat = (cat) => { state.animationCat = cat; state.animationType = ""; render(); };
+    window.setAnimationType = (type) => { state.animationType = type; render(); };
+    
+    window.setCauserieType = (type) => { state.causerieType = type; render(); };
+    window.setVisualStyle = (style) => { state.visualStyle = style; render(); };
+    
+    window.setSupportCat = (cat) => { state.supportCat = cat; state.supportType = ""; render(); };
+    window.setSupportType = (type) => { state.supportType = type; render(); };
+
+    window.toggleIaTheme = () => { state.iaDecidesTheme = !state.iaDecidesTheme; render(); };
+    window.setLieu = (lieu) => { state.lieu = lieu; render(); };
+    window.setTheme = (theme) => { state.theme = theme; render(); };
+    
+    // Ces fonctions sont appelées par oninput sans déclencher un rendu complet pour éviter de perdre le focus
+    window.updateCustomLieu = (val) => { state.customLieu = val; };
+    window.updateCustomTheme = (val) => { state.customTheme = val; };
+
+    window.setLanguageLevel = (level) => { state.languageLevel = level; render(); };
+
+    window.handleCopy = () => {
+      const textToCopy = generatePrompt();
+      try {
+        const textArea = document.createElement("textarea");
+        textArea.value = textToCopy;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        state.isCopied = true;
+        render();
+        setTimeout(() => { state.isCopied = false; render(); }, 2000);
+      } catch (err) {
+        console.error("Erreur lors de la copie du texte :", err);
+      }
+    };
+
+    window.nextStep = () => { state.currentStep = Math.min(state.totalSteps, state.currentStep + 1); render(); };
+    window.prevStep = () => { state.currentStep = Math.max(1, state.currentStep - 1); render(); };
+
+    // --- MOTEUR DE RENDU (VANILLA JS) ---
+    
+    function renderStep1() {
+      let html = `<div class="animate-fade-in">
+        <h2 class="text-2xl font-bold mb-6 text-slate-800 border-b pb-2">1. Niveau scolaire et Concepts (PFEQ)</h2>
+        
+        <div class="mb-6">
+          <h3 class="font-semibold mb-3 text-lg">Cycle d'enseignement</h3>
+          <div class="flex gap-4">`;
+          
+      [1, 2, 3].forEach(cycle => {
+        const activeClass = state.selectedCycle === cycle ? 'bg-indigo-600 text-white shadow-md transform scale-105' : 'bg-gray-200 text-gray-700 hover:bg-gray-300';
+        html += `<button onclick="setCycle(${cycle})" class="px-6 py-3 rounded-xl font-bold transition-all ${activeClass}">Cycle ${cycle}</button>`;
+      });
+      
+      html += `</div></div>`;
+
+      if (state.selectedCycle) {
+        html += `<div class="mb-8 animate-fade-in">
+            <h3 class="font-semibold mb-3 text-lg">Année</h3>
+            <div class="flex gap-4">`;
+        
+        [(state.selectedCycle * 2) - 1, state.selectedCycle * 2].forEach(year => {
+          const activeClass = state.selectedYear === year ? 'bg-blue-500 text-white shadow-md transform scale-105' : 'bg-gray-200 text-gray-700 hover:bg-gray-300';
+          html += `<button onclick="setYear(${year})" class="px-6 py-3 rounded-xl font-bold transition-all ${activeClass}">${year}e année</button>`;
+        });
+        
+        html += `</div></div>`;
+      }
+
+      if (state.selectedYear) {
+        html += `
+          <div class="mt-8 animate-fade-in">
+            <div class="bg-blue-50 p-4 rounded-lg mb-6 flex items-start gap-3 border border-blue-100">
+              <i data-lucide="info" class="text-blue-500 flex-shrink-0 mt-1 w-5 h-5"></i>
+              <p class="text-sm text-blue-800">
+                <strong>Légende des couleurs :</strong><br/>
+                <span class="text-blue-600 font-bold">Bleu</span> : Concepts ciblés ou introduits lors du cycle actuel.<br/>
+                <span class="text-gray-900 font-bold">Gras</span> : Concepts finalisés dans l'autre année de ce même cycle.<br/>
+                <span class="text-gray-500 opacity-80">Pâle</span> : Concepts des cycles inférieurs (révision).<br/>
+                <span class="text-red-500 font-bold">Rouge</span> : Concepts exclusifs aux cycles supérieurs (non initiés).
+              </p>
+            </div>
+
+            <h3 class="text-xl font-bold mb-4 bg-indigo-100 p-3 rounded-md text-indigo-900">Sélection des concepts</h3>
+            <div class="space-y-8 max-h-[600px] overflow-y-auto pr-4 custom-scrollbar">`;
+
+        Object.keys(groupedConcepts).forEach(cat => {
+          html += `<div class="border-l-4 border-indigo-400 pl-4">
+            <h4 class="text-lg font-bold text-slate-800 mb-4 bg-slate-100 p-2 rounded">${cat}</h4>`;
+          
+          Object.keys(groupedConcepts[cat]).forEach(sub => {
+            html += `<div class="mb-6 ml-4">
+              <h5 class="font-semibold text-slate-700 mb-3 underline decoration-indigo-200 underline-offset-4">${sub}</h5>
+              <div class="flex flex-col gap-2">`;
+            
+            groupedConcepts[cat][sub].forEach(concept => {
+              const isChecked = state.selectedConcepts.includes(concept.id);
+              const style = getConceptStyle(concept);
+              html += `
+                <label class="flex items-start gap-3 cursor-pointer group hover:bg-slate-50 p-2 rounded-md transition-colors">
+                  <input type="checkbox" onclick="toggleConcept('${concept.id}')" ${isChecked ? 'checked' : ''} class="mt-1 w-5 h-5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500 cursor-pointer" />
+                  <span class="${style} transition-colors duration-200">${concept.text}</span>
+                </label>`;
+            });
+            html += `</div></div>`;
+          });
+          html += `</div>`;
+        });
+        html += `</div></div>`;
+      }
+      return html + `</div>`;
+    }
+
+    function renderStep2() {
+      let html = `<div class="animate-fade-in">
+        <h2 class="text-2xl font-bold mb-6 text-slate-800 border-b pb-2">2. Comment animer la causerie</h2>
+        <div class="space-y-6">`;
+      
+      Object.keys(ANIMATION_CHOICES).forEach(cat => {
+        const isCatChecked = state.animationCat === cat;
+        html += `<div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+          <label class="flex items-center gap-3 cursor-pointer mb-4">
+            <input type="radio" name="animCat" onclick="setAnimationCat('${cat}')" ${isCatChecked ? 'checked' : ''} class="w-5 h-5 text-indigo-600 focus:ring-indigo-500" />
+            <span class="text-lg font-bold text-slate-800">${cat}</span>
+          </label>`;
+        
+        if (isCatChecked) {
+          html += `<div class="ml-8 grid grid-cols-1 sm:grid-cols-2 gap-3 animate-fade-in">`;
+          ANIMATION_CHOICES[cat].forEach(type => {
+            const isTypeChecked = state.animationType === type;
+            const activeClass = isTypeChecked ? 'bg-indigo-100 border-indigo-400 shadow-sm' : 'bg-white border-slate-200 hover:border-indigo-300';
+            html += `
+              <label class="flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition-all ${activeClass}">
+                <input type="radio" name="animType" onclick="setAnimationType('${type}')" ${isTypeChecked ? 'checked' : ''} class="w-4 h-4 text-indigo-600" />
+                <span class="capitalize">${type}</span>
+              </label>`;
+          });
+          html += `</div>`;
+        }
+        html += `</div>`;
+      });
+      return html + `</div></div>`;
+    }
+
+    function renderStep3() {
+      let html = `<div class="animate-fade-in">
+        <h2 class="text-2xl font-bold mb-6 text-slate-800 border-b pb-2">3. Type de causerie</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">`;
+      CAUSERIE_TYPES.forEach(type => {
+        const activeClass = state.causerieType === type ? 'bg-indigo-50 border-indigo-600 text-indigo-900 shadow-md transform scale-[1.02]' : 'bg-white border-slate-200 text-slate-700 hover:border-indigo-300 hover:shadow-sm';
+        html += `<button onclick="setCauserieType('${type.replace(/'/g, "\\'")}')" class="p-4 rounded-xl text-left border-2 font-medium transition-all ${activeClass}">${type}</button>`;
+      });
+      return html + `</div></div>`;
+    }
+
+    function renderStep4() {
+      let html = `<div class="animate-fade-in">
+        <h2 class="text-2xl font-bold mb-6 text-slate-800 border-b pb-2">4. Support visuel de l'application</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">`;
+      VISUAL_STYLES.forEach(style => {
+        const activeClass = state.visualStyle === style ? 'bg-indigo-600 border-indigo-700 text-white shadow-lg transform scale-105' : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-300 hover:shadow-sm';
+        html += `<button onclick="setVisualStyle('${style.replace(/'/g, "\\'")}')" class="p-4 rounded-xl text-center border-2 font-semibold capitalize transition-all ${activeClass}">${style}</button>`;
+      });
+      return html + `</div></div>`;
+    }
+
+    function renderStep5() {
+      let html = `<div class="animate-fade-in">
+        <h2 class="text-2xl font-bold mb-6 text-slate-800 border-b pb-2">5. Type de support pour amorcer la réflexion</h2>
+        <div class="space-y-6">`;
+      
+      Object.keys(SUPPORT_CHOICES).forEach(cat => {
+        const isCatChecked = state.supportCat === cat;
+        html += `<div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+          <label class="flex items-center gap-3 cursor-pointer mb-4">
+            <input type="radio" name="supportCat" onclick="setSupportCat('${cat.replace(/'/g, "\\'")}')" ${isCatChecked ? 'checked' : ''} class="w-5 h-5 text-indigo-600 focus:ring-indigo-500" />
+            <span class="text-lg font-bold text-slate-800">${cat}</span>
+          </label>`;
+        
+        if (isCatChecked) {
+          html += `<div class="ml-8 grid grid-cols-1 sm:grid-cols-2 gap-3 animate-fade-in">`;
+          SUPPORT_CHOICES[cat].forEach(type => {
+            const isTypeChecked = state.supportType === type;
+            const activeClass = isTypeChecked ? 'bg-indigo-100 border-indigo-400 shadow-sm' : 'bg-white border-slate-200 hover:border-indigo-300';
+            html += `
+              <label class="flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition-all ${activeClass}">
+                <input type="radio" name="supportType" onclick="setSupportType('${type.replace(/'/g, "\\'")}')" ${isTypeChecked ? 'checked' : ''} class="w-4 h-4 text-indigo-600" />
+                <span>${type}</span>
+              </label>`;
+          });
+          html += `</div>`;
+        }
+        html += `</div>`;
+      });
+      return html + `</div></div>`;
+    }
+
+    function renderStep6() {
+      let html = `<div class="animate-fade-in">
+        <h2 class="text-2xl font-bold mb-6 text-slate-800 border-b pb-2">6. Lieu et Thème (Contextualisation)</h2>
+        <div class="mb-8 p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input type="checkbox" onclick="toggleIaTheme()" ${state.iaDecidesTheme ? 'checked' : ''} class="w-6 h-6 text-indigo-600 rounded" />
+            <span class="text-lg font-bold text-indigo-900">✨ Laisser l'IA décider du lieu et du thème</span>
+          </label>
+        </div>`;
+
+      if (!state.iaDecidesTheme) {
+        html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-8 animate-fade-in">
+            <div class="bg-white p-5 rounded-xl border shadow-sm">
+              <h3 class="text-lg font-bold mb-4 flex items-center gap-2"><div class="w-2 h-6 bg-indigo-500 rounded"></div>Lieu</h3>
+              <div class="max-h-60 overflow-y-auto space-y-2 pr-2 custom-scrollbar">`;
+        
+        LIEUX.forEach(l => {
+          html += `<label class="flex items-center gap-2 p-2 hover:bg-slate-50 rounded cursor-pointer">
+            <input type="radio" name="lieu" onclick="setLieu('${l.replace(/'/g, "\\'")}')" ${state.lieu === l ? 'checked' : ''} class="text-indigo-600" />
+            <span>${l}</span>
+          </label>`;
+        });
+        html += `</div>`;
+        if (state.lieu === "Autre") {
+          html += `<input type="text" placeholder="Préciser le lieu..." oninput="updateCustomLieu(this.value)" value="${state.customLieu}" class="mt-4 w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" />`;
+        }
+        html += `</div>
+            <div class="bg-white p-5 rounded-xl border shadow-sm">
+              <h3 class="text-lg font-bold mb-4 flex items-center gap-2"><div class="w-2 h-6 bg-blue-500 rounded"></div>Thème</h3>
+              <div class="max-h-60 overflow-y-auto space-y-2 pr-2 custom-scrollbar">`;
+        
+        THEMES.forEach(t => {
+          html += `<label class="flex items-center gap-2 p-2 hover:bg-slate-50 rounded cursor-pointer">
+            <input type="radio" name="theme" onclick="setTheme('${t.replace(/'/g, "\\'")}')" ${state.theme === t ? 'checked' : ''} class="text-indigo-600" />
+            <span>${t}</span>
+          </label>`;
+        });
+        html += `</div>`;
+        if (state.theme === "Autre") {
+          html += `<input type="text" placeholder="Préciser le thème..." oninput="updateCustomTheme(this.value)" value="${state.customTheme}" class="mt-4 w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" />`;
+        }
+        html += `</div></div>`;
+      }
+      return html + `</div>`;
+    }
+
+    function renderStep7() {
+      let html = `<div class="animate-fade-in">
+        <h2 class="text-2xl font-bold mb-6 text-slate-800 border-b pb-2">7. Niveau de langage pour les élèves</h2>
+        <div class="space-y-4">`;
+      
+      const levels = [
+        { id: "Très simple", desc: "1re-2e année, phrases courtes, vocabulaire très simple, PFEQ respecté." },
+        { id: "Simple", desc: "3e-4e année, phrases plus longues, introduction progressive des termes PFEQ." },
+        { id: "Standard", desc: "5e-6e année, vocabulaire précis, termes PFEQ, explications étape par étape." }
+      ];
+
+      levels.forEach(level => {
+        const isActive = state.languageLevel === level.id;
+        const activeClass = isActive ? 'bg-indigo-600 border-indigo-700 text-white shadow-lg transform scale-[1.01]' : 'bg-gray-200 border-transparent text-gray-700 hover:bg-gray-300';
+        const textClass = isActive ? 'text-indigo-100' : 'text-gray-500';
+        
+        html += `<button onclick="setLanguageLevel('${level.id}')" class="w-full text-left p-5 rounded-xl border-2 transition-all flex flex-col gap-2 ${activeClass}">
+          <span class="text-xl font-bold">${level.id}</span>
+          <span class="${textClass}">${level.desc}</span>
+        </button>`;
+      });
+      return html + `</div></div>`;
+    }
+
+    function renderStep8() {
+      const promptText = generatePrompt();
+      const btnClass = state.isCopied ? 'bg-green-500 text-white' : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:scale-105';
+      const icon = state.isCopied ? '<i data-lucide="check-circle" class="w-5 h-5"></i> Copié !' : '<i data-lucide="copy" class="w-5 h-5"></i> Copier le texte';
+      
+      return `<div class="animate-fade-in">
+        <div class="flex justify-between items-center mb-6 border-b pb-4">
+          <h2 class="text-3xl font-bold text-slate-800 flex items-center gap-3">
+            <i data-lucide="wand-2" class="text-indigo-600 w-8 h-8"></i>
+            Votre requête est prête !
+          </h2>
+          <button onclick="handleCopy()" class="flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all shadow-md ${btnClass}">
+            ${icon}
+          </button>
+        </div>
+
+        <div class="bg-slate-100 p-2 rounded-xl">
+          <textarea readonly class="w-full h-[500px] p-6 rounded-lg font-mono text-sm leading-relaxed outline-none resize-none transition-all duration-300 ${state.isCopied ? 'bg-gray-200 text-gray-400' : 'bg-white text-slate-800 border border-slate-300 shadow-inner'}">${promptText}</textarea>
+        </div>
+        <p class="text-right text-sm text-slate-500 mt-2 font-mono">
+          ${promptText.length} / 4000 caractères
+        </p>
+      </div>`;
+    }
+
+    // Fonction Principale de Rendu
+    function render() {
+      const appDiv = document.getElementById('app');
+      
+      // Construction du header
+      let html = `
+        <header class="bg-indigo-600 text-white p-6 shadow-md">
+          <div class="max-w-5xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <i data-lucide="sparkles" class="w-8 h-8 text-yellow-300"></i>
+              <h1 class="text-2xl font-bold tracking-tight">Générateur de Causeries Mathématiques</h1>
+            </div>
+            <div class="text-indigo-200 font-medium">
+              Étape ${state.currentStep} / ${state.totalSteps}
+            </div>
+          </div>
+        </header>
+
+        <main class="max-w-5xl mx-auto mt-8 p-4">
+          <!-- Barre de progression -->
+          <div class="flex mb-8 space-x-2 overflow-x-auto pb-2 custom-scrollbar">`;
+      
+      stepTitles.forEach((title, idx) => {
+        const isActive = state.currentStep === idx + 1;
+        const classes = isActive ? 'bg-indigo-600 text-white font-bold shadow' : 'bg-gray-200 text-gray-500 hover:bg-gray-300';
+        html += `<div onclick="setStep(${idx + 1})" class="flex-1 min-w-[100px] text-center text-sm py-2 px-3 rounded-full transition-colors duration-200 cursor-pointer ${classes}">
+          ${title}
+        </div>`;
+      });
+      
+      html += `</div><div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 min-h-[500px] border border-slate-100">`;
+
+      // Contenu de l'étape
+      switch(state.currentStep) {
+        case 1: html += renderStep1(); break;
+        case 2: html += renderStep2(); break;
+        case 3: html += renderStep3(); break;
+        case 4: html += renderStep4(); break;
+        case 5: html += renderStep5(); break;
+        case 6: html += renderStep6(); break;
+        case 7: html += renderStep7(); break;
+        case 8: html += renderStep8(); break;
+      }
+
+      html += `</div>
+        <!-- Navigation Footer -->
+        <div class="mt-8 flex justify-between">
+          <button onclick="prevStep()" ${state.currentStep === 1 ? 'disabled' : ''} class="flex items-center gap-2 px-6 py-3 rounded-full font-bold transition-colors ${state.currentStep === 1 ? 'opacity-0 cursor-default' : 'bg-white text-slate-700 border hover:bg-slate-100 shadow-sm'}">
+            <i data-lucide="chevron-left" class="w-5 h-5"></i> Précédent
+          </button>`;
+          
+      if (state.currentStep < state.totalSteps) {
+        html += `<button onclick="nextStep()" class="flex items-center gap-2 px-8 py-3 rounded-full font-bold bg-indigo-600 text-white hover:bg-indigo-700 shadow-md hover:scale-105 transition-all">
+          Suivant <i data-lucide="chevron-right" class="w-5 h-5"></i>
+        </button>`;
+      } else {
+        const btnClass = state.isCopied ? 'bg-green-500' : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:scale-105';
+        const icon = state.isCopied ? '<i data-lucide="check-circle" class="w-5 h-5"></i> Copié !' : '<i data-lucide="copy" class="w-5 h-5"></i> Copier la requête';
+        html += `<button onclick="handleCopy()" class="flex items-center gap-2 px-8 py-3 rounded-full font-bold text-white shadow-md transition-all ${btnClass}">
+          ${icon}
+        </button>`;
+      }
+      
+      html += `</div></main>`;
+      
+      appDiv.innerHTML = html;
+      
+      // Initialisation des icônes après chaque rendu
+      lucide.createIcons();
+    }
+
+    // Premier rendu au chargement
+    document.addEventListener("DOMContentLoaded", render);
+  </script>
+</body>
+</html>
