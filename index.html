@@ -575,6 +575,11 @@ Génère le code complet, interactif, visuellement parfait et pédagogiquement i
     function render() {
       const appDiv = document.getElementById('app');
       
+      // Sauvegarde des positions de défilement (page et conteneurs internes) pour éviter les sauts
+      const pageScrollY = window.scrollY;
+      const scrollElements = document.querySelectorAll('.custom-scrollbar');
+      const scrollPositions = Array.from(scrollElements).map(el => el.scrollTop);
+      
       // Construction du header
       let html = `
         <header class="bg-indigo-600 text-white p-6 shadow-md">
@@ -640,6 +645,15 @@ Génère le code complet, interactif, visuellement parfait et pédagogiquement i
       
       // Initialisation des icônes après chaque rendu
       lucide.createIcons();
+
+      // Restauration immédiate des positions de défilement
+      window.scrollTo(0, pageScrollY);
+      const newScrollElements = document.querySelectorAll('.custom-scrollbar');
+      newScrollElements.forEach((el, index) => {
+        if (scrollPositions[index] !== undefined) {
+          el.scrollTop = scrollPositions[index];
+        }
+      });
     }
 
     // Premier rendu au chargement
